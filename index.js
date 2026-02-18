@@ -40,8 +40,8 @@ app.use((err, req, res, next) => {
 // Connect DB
 await connectToMongodb(process.env.MONGODB_URI_CONNECTION);
 
-// Start server
-const PORT = process.env.PORT || 3000;
+// Start server (use PORT=8000 for Power BI Lite frontend)
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
