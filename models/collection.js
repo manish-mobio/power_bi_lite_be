@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Dynamic schema for uploaded collections
+// Dynamic schema for uploaded 
 const collectionSchema = new mongoose.Schema({
   name: {
     type: String,
