@@ -276,4 +276,38 @@ async function handleGetCollectionData(req, res, next) {
   }
 }
 
-export { handleGetData, handleGetDashboards, handleGetDashboardById, handlePostDashboard, handleFileUpload, handleGetCollectionData }
+/**
+ * Get collection metadata (e.g. recordCount) for a collection
+ */
+async function handleGetCollectionMeta(req, res, next) {
+  try {
+    const { collection } = req.params;
+    if (!collection) {
+      return res.status(400).json({ error: 'Collection name is required' });
+    }
+    const collectionMeta = await Collection.findOne({ name: collection }).lean();
+    if (!collectionMeta) {
+      return res.status(404).json({ error: `Collection "${collection}" not found` });
+    }
+    return res.status(200).json({
+      recordCount: collectionMeta.recordCount != null ? collectionMeta.recordCount : 0,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get list of all collections
+ */
+async function handleGetCollections(req, res, next) {
+  try {
+    const collections = await Collection.find({}).select('name recordCount').sort({ name: 1 }).lean();
+    const collectionNames = collections.map(c => c.name);
+    return res.status(200).json(collectionNames);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { handleGetData, handleGetDashboards, handleGetDashboardById, handlePostDashboard, handleFileUpload, handleGetCollectionData, handleGetCollectionMeta, handleGetCollections }
