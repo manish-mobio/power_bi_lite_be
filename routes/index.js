@@ -1,5 +1,5 @@
 import express from "express";
-import { handleGetData, handleGetDashboards, handleGetDashboardById, handlePostDashboard, handleFileUpload, handleGetCollectionData } from "../controller/index.js";
+import { handleGetData, handleGetDashboards, handleGetDashboardById, handlePostDashboard, handleFileUpload, handleGetCollectionData, handleGetCollectionMeta, handleGetCollections } from "../controller/index.js";
 
 const router = express.Router();
 
@@ -15,6 +15,11 @@ router.post('/dashboards', handlePostDashboard);
 // File Upload - POST /api/v1/upload
 router.post('/upload', handleFileUpload);
 
+// List all collections - GET /api/v1/collections
+router.get('/collections', handleGetCollections);
+
+// Collection metadata (recordCount) - must be before :collection to match /collection/:name/meta
+router.get('/collection/:collection/meta', handleGetCollectionMeta);
 // Dynamic Collection Data - GET /api/v1/collection/:collection
 router.get('/collection/:collection', handleGetCollectionData);
 
