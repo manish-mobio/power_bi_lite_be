@@ -40,11 +40,12 @@ async function handleGetDashboardById(req, res, next) {
 
 async function handlePostDashboard(req, res, next) {
     try {
-        const { name = 'My Dashboard', charts = [], layouts = {} } = req.body || {};
+        const { name = 'My Dashboard', charts = [], layouts = {}, logo } = req.body || {};
         const dashboard = await dashboardTbl.create({
             name,
             charts,
             layouts,
+            ...(logo != null && typeof logo === 'string' ? { logo } : {}),
         });
         return res.status(201).json(dashboard);
     } catch (error) {
