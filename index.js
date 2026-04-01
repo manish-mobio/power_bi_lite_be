@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectToMongodb } from "./config/index.js";
 import routes from "./routes/index.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const app = express();
 // Middleware - Increase body size limit for file uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
+app.use(cookieParser());
 
 // Test route
 app.get("/", (req, res) => {
