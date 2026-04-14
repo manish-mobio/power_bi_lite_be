@@ -1,0 +1,32 @@
+const constants = {
+  EMAIL_IS_REQUIRED: 'Email is required',
+  INVALID_PASSWORD_LENGTH: 'Password must be at least 8 characters',
+  USER_ALREADY_EXISTS: 'User already exists',
+  SERVER_AUTH_MISCONFIGURED: 'Server auth misconfigured',
+  UNAUTHORIZED: 'Unauthorized',
+  EMAIL_AND_PASSWORD_REQUIRED: 'Email and password are required',
+  INVALID_CREDENTIALS: 'Invalid credentials',
+  INTERNAL_SERVER_ERROR: 'Internal server error',
+  CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
+  CURRENT_AND_NEW_PASSWORD_REQUIRED: 'Current and new password are required',
+  CURRENT_AND_NEW_PASSWORD_MUST_BE_DIFFERENT: 'Current and new passwords must be different',
+  COLLECTION_NAME_REQUIRED: 'Collection name is required',
+  COLLECTION_NOT_FOUND: 'Collection not found',
+  INVALID_DASHBOARD_ID: 'Invalid dashboard ID',
+  DASHBOARD_NOT_FOUND: 'Dashboard not found',
+  INVALID_DASHBOARD_ID: 'Invalid dashboard ID',
+  SHARES_MUST_BE_A_NON_EMPTY_ARRAY: 'Shares must be a non-empty array',
+  CSV_MUST_HAVE_AT_LEAST_A_HEADER_AND_ONE_DATA_ROW:
+    'CSV must have at least a header and one data row',
+  ONLY_EDITORS_CAN_SHARE: 'Only editors can share',
+  CANNOT_SAVE_DASHBOARD: 'Cannot save this dashboard',
+  ONLY_OWNER_CAN_SYNC_SHARED_CHANGES: 'Only the owner can sync shared changes',
+  DASHBOARD_LINEAGE_NOT_FOUND: 'Dashboard lineage not found',
+  FILE_CONTENT_REQUIRED: 'File content is required',
+  UNSUPPORTED_FILE_TYPE: 'Unsupported file type. Use CSV or JSON.',
+  NO_VALID_DATA_FOUND_IN_FILE: 'No valid data found in file',
+  FAILED_TO_PARSE_FILE: 'Failed to parse file',
+  SESSION_EXPIRED: 'Session expired',
+};
+
+export default constants;
