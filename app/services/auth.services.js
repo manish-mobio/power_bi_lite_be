@@ -1,5 +1,5 @@
 import AuthUser from '../models/authUser.model.js';
-
+import jwt from 'jsonwebtoken';
 /**
  * DB-only helpers for AuthUser. No business rules or hashing here.
  */
@@ -36,6 +36,11 @@ async function findAuthUsersByIds(ids, projection) {
   return q.lean();
 }
 
+
+function generateToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: constants.EXPIRES_IN_DAYS });
+} 
+
 export default {
   findOneAuthUser,
   findAuthUserById,
@@ -44,4 +49,5 @@ export default {
   findOneAuthUserByEmail,
   // findAuthUserByEmailSelect,
   findAuthUsersByIds,
+  generateToken
 };

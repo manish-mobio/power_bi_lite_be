@@ -9,18 +9,29 @@ function inferSchema(doc) {
     if (key.startsWith('_') && key !== '_id') continue;
     if (key === '__v') continue;
 
-    if (value === null || value === undefined) {
-      schema[key] = { type: 'string', detected: false };
-    } else if (typeof value === 'number') {
-      schema[key] = { type: 'number', detected: true };
-    } else if (typeof value === 'boolean') {
-      schema[key] = { type: 'boolean', detected: true };
-    } else if (Array.isArray(value)) {
-      schema[key] = { type: 'array', detected: true };
-    } else if (typeof value === 'object') {
-      schema[key] = { type: 'object', detected: true };
-    } else {
-      schema[key] = { type: 'string', detected: true };
+    switch (true) {
+      case value === null || value === undefined:
+        schema[key] = { type: 'string', detected: false };
+        break;
+
+      case typeof value === 'number':
+        schema[key] = { type: 'number', detected: true };
+        break;
+
+      case typeof value === 'boolean':
+        schema[key] = { type: 'boolean', detected: true };
+        break;
+
+      case Array.isArray(value):
+        schema[key] = { type: 'array', detected: true };
+        break;
+
+      case typeof value === 'object':
+        schema[key] = { type: 'object', detected: true };
+        break;
+
+      default:
+        schema[key] = { type: 'string', detected: true };
     }
   }
 

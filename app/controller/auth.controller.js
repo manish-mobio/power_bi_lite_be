@@ -1,7 +1,6 @@
 import { clearAuthCookie, setAuthCookie } from '../middleware/auth.middleware.js';
 import { normalizeEmail } from '../utils/common.utils.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
 import authServices from '../services/auth.services.js';
@@ -27,14 +26,8 @@ async function handleSignup(req, res, next) {
       name: typeof name === 'string' ? name.trim() : '',
     });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret)
-      return res
-        .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ error: constants.SERVER_AUTH_MISCONFIGURED });
-    const token = jwt.sign({ sub: String(user._id), email: user.email }, secret, {
-      expiresIn: '7d',
-    });
+    const token = authServices.generateToken({ sub: String(user._id), email: user.email });
+
     setAuthCookie(res, token);
 
     return res
@@ -65,14 +58,8 @@ async function handleLogin(req, res, next) {
     if (!ok)
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: constants.INVALID_CREDENTIALS });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret)
-      return res
-        .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ error: constants.SERVER_AUTH_MISCONFIGURED });
-    const token = jwt.sign({ sub: String(user._id), email: user.email }, secret, {
-      expiresIn: '7d',
-    });
+    const token = authServices.generateToken({ sub: String(user._id), email: user.email });
+
     setAuthCookie(res, token);
     return res.status(HTTP_STATUS.OK).json({ id: user._id, email: user.email, name: user.name });
   } catch (error) {

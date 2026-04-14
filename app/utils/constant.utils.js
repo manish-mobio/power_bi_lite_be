@@ -27,6 +27,7 @@ const constants = {
   NO_VALID_DATA_FOUND_IN_FILE: 'No valid data found in file',
   FAILED_TO_PARSE_FILE: 'Failed to parse file',
   SESSION_EXPIRED: 'Session expired',
+  EXPIRES_IN_DAYS: '7d',
 };
 
 export default constants;

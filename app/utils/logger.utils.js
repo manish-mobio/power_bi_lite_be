@@ -31,7 +31,7 @@ const loggerMain = () => {
 
 // manage the logs in db
 const apiLogger = () => {
-  const db = DATABASE_URL || `mongodb://127.0.0.1:27017/${DB_NAME}`;
+  const db = DATABASE_URL ;
   return createLogger({
     format: combine(timestamp(), customFormat),
     transports: [

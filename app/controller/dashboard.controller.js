@@ -37,7 +37,7 @@ async function handleGetDashboards(req, res, next) {
 async function findDashboardWithAccess(id, userId) {
   const myId = String(userId);
   const dashboard = await dashboardServices.findDashboardByIdLean(id);
-  console.log('dashboard 7043', dashboard);
+  
   if (!dashboard) return null;
 
   if (String(dashboard.userId) === myId) return dashboard;
@@ -48,13 +48,13 @@ async function findDashboardWithAccess(id, userId) {
   const ownerId = dashboard.userId;
   const lk = dashboard.lineageId || dashboard._id;
 
-  console.log('lk 7043', ownerId, lk, userId);
+  
   const sibling = await dashboardServices.findSharedDashboard({
     ownerId,
     lk,
     userId
   });
-  console.log('sibling 7043', sibling);
+  
   if (sibling) return dashboard;
 
   return null;
@@ -68,7 +68,7 @@ async function handleGetDashboardById(req, res, next) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.INVALID_DASHBOARD_ID });
     }
     const myId = String(req.user.id);
-    console.log('myId 7043', myId);
+    
     const dashboard = await findDashboardWithAccess(id, req.user.id);
     if (!dashboard) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ error: constants.DASHBOARD_NOT_FOUND });
