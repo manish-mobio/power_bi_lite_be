@@ -1,5 +1,6 @@
 import AuthUser from '../models/authUser.model.js';
 import jwt from 'jsonwebtoken';
+import constants from '../utils/constant.utils.js';
 /**
  * DB-only helpers for AuthUser. No business rules or hashing here.
  */
@@ -24,22 +25,15 @@ async function createAuthUser(data) {
   return AuthUser.create(data);
 }
 
-// async function findAuthUserByEmailSelect(email, projection) {
-//   const q = AuthUser.findOne({ email });
-//   if (projection) q.select(projection);
-//   return q.lean();
-// }
-
 async function findAuthUsersByIds(ids, projection) {
   const q = AuthUser.find({ _id: { $in: ids } });
   if (projection) q.select(projection);
   return q.lean();
 }
 
-
 function generateToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: constants.EXPIRES_IN_DAYS });
-} 
+}
 
 export default {
   findOneAuthUser,
@@ -47,7 +41,6 @@ export default {
   findAuthUserByIdForUpdate,
   createAuthUser,
   findOneAuthUserByEmail,
-  // findAuthUserByEmailSelect,
   findAuthUsersByIds,
-  generateToken
+  generateToken,
 };

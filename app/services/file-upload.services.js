@@ -20,13 +20,6 @@ async function insertManyInDynamicCollection(collectionName, docs) {
   return Model.insertMany(docs);
 }
 
-// async function updateCollectionMetaByName(name, update, options = {}) {
-//   return Collection.findOneAndUpdate({ name }, update, {
-//     new: true,
-//     ...options,
-//   });
-// }
-
 async function createCollectionMeta(data) {
   return Collection.create(data);
 }
@@ -49,7 +42,6 @@ export default {
   findCollectionMetaByName,
   deleteManyInDynamicCollection,
   insertManyInDynamicCollection,
-  // updateCollectionMetaByName,
   createCollectionMeta,
   buildCollectionPayload,
 };

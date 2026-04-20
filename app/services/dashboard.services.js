@@ -4,21 +4,11 @@ async function findDashboardByIdLean(id) {
   return dashboardTbl.findById(id).lean();
 }
 
-// async function findOneDashboardLean(filter, sort) {
-//   const q = dashboardTbl.findOne(filter);
-//   if (sort) q.sort(sort);
-//   return q.lean();
-// }
-
 async function findDashboardsLean(filter, sort) {
   const q = dashboardTbl.find(filter);
   if (sort) q.sort(sort);
   return q.lean();
 }
-
-// async function createDashboardDoc(doc) {
-//   return dashboardTbl.create(doc);
-// }
 
 async function updateDashboardById(id, update, options = {}) {
   return dashboardTbl.findByIdAndUpdate(id, update, {
@@ -26,32 +16,6 @@ async function updateDashboardById(id, update, options = {}) {
     ...options,
   });
 }
-
-// async function updateSharedDashboards({
-//   userId,
-//   lineage,
-//   sharedPayload,
-// }) {
-//   return dashboardTbl.updateMany(
-//     {
-//       userId,
-//       $or: [{ lineageId: lineage }, { _id: lineage }],
-//     },
-//     {
-//       $set: { sharedWith: sharedPayload },
-//     }
-//   );
-// }
-
-// async function findSharedDashboard({ ownerId, lk, userId }) {
-//   return dashboardTbl
-//     .findOne({
-//       userId: ownerId,
-//       $or: [{ lineageId: lk }, { _id: lk }],
-//       'sharedWith.userId': userId,
-//     })
-//     .lean();
-// }
 
 async function findSharedDashboard({ ownerId, lk, userId }) {
   return dashboardTbl
@@ -89,19 +53,16 @@ async function updateManyDashboards(filter, update) {
   return dashboardTbl.updateMany(filter, update);
 }
 async function findDashboardByIdAndSort(filter, sort) {
-  return dashboardTbl.findOne(filter)
-    .sort(sort)
-    .lean();
+  return dashboardTbl.findOne(filter).sort(sort).lean();
 }
 
 export default {
   findDashboardByIdAndSort,
   createDashboard,
   findSharedDashboard,
+  buildDashboardPayload,
   findDashboardByIdLean,
-  // findOneDashboardLean,
   findDashboardsLean,
-  // createDashboardDoc,
   updateDashboardById,
   updateManyDashboards,
 };
