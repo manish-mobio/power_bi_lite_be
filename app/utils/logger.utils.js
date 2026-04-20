@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import { MongoDB } from 'winston-mongodb';
 const { combine, timestamp, printf, prettyPrint, errors, splat } = format;
-const { DB_NAME, DATABASE_URL } = process.env;
+const { DATABASE_URL } = process.env;
 
 const myFormat = printf(({ level, message, timestamp, stack, url }) => {
   return `${level} : ${url ?? ''} ${timestamp} ${message} ${stack ?? ''}`;
@@ -31,7 +31,7 @@ const loggerMain = () => {
 
 // manage the logs in db
 const apiLogger = () => {
-  const db = DATABASE_URL ;
+  const db = DATABASE_URL;
   return createLogger({
     format: combine(timestamp(), customFormat),
     transports: [

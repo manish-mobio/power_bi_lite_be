@@ -37,7 +37,7 @@ async function handleGetDashboards(req, res, next) {
 async function findDashboardWithAccess(id, userId) {
   const myId = String(userId);
   const dashboard = await dashboardServices.findDashboardByIdLean(id);
-  
+
   if (!dashboard) return null;
 
   if (String(dashboard.userId) === myId) return dashboard;
@@ -48,13 +48,12 @@ async function findDashboardWithAccess(id, userId) {
   const ownerId = dashboard.userId;
   const lk = dashboard.lineageId || dashboard._id;
 
-  
   const sibling = await dashboardServices.findSharedDashboard({
     ownerId,
     lk,
-    userId
+    userId,
   });
-  
+
   if (sibling) return dashboard;
 
   return null;
@@ -68,7 +67,7 @@ async function handleGetDashboardById(req, res, next) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.INVALID_DASHBOARD_ID });
     }
     const myId = String(req.user.id);
-    
+
     const dashboard = await findDashboardWithAccess(id, req.user.id);
     if (!dashboard) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ error: constants.DASHBOARD_NOT_FOUND });
@@ -81,7 +80,35 @@ async function handleGetDashboardById(req, res, next) {
       effectiveRole = entry?.role || null;
     }
 
-    return res.status(HTTP_STATUS.OK).json({ ...dashboard, effectiveRole });
+    let pendingCollaboratorSync = false;
+    if (String(dashboard.userId) === myId) {
+      const ol = dashboard.lineageId || dashboard._id;
+      const ownerLatest = await dashboardServices.findDashboardByIdAndSort(
+        {
+          userId: dashboard.userId,
+          $or: [{ lineageId: ol }, { _id: ol }],
+        },
+        { versionNumber: -1, updatedAt: -1 }
+      );
+      if (ownerLatest) {
+        const latestFork = await dashboardServices.findDashboardByIdAndSort(
+          {
+            ownerLineageId: ol,
+            userId: { $ne: dashboard.userId },
+          },
+          { updatedAt: -1 }
+        );
+        if (latestFork) {
+          pendingCollaboratorSync = !sameDashboardPayload(ownerLatest, latestFork);
+        }
+      }
+    }
+
+    return res.status(HTTP_STATUS.OK).json({
+      ...dashboard,
+      effectiveRole,
+      pendingCollaboratorSync,
+    });
   } catch (error) {
     next(error);
   }
@@ -153,11 +180,12 @@ async function handleShareDashboard(req, res, next) {
     dashboard.sharedWith = sharedPayload;
 
     const lineage = dashboard.lineageId || dashboard._id;
+    // Propagate shares to every version in this lineage for the owner.
+    // (Filter must use lineageId / _id — not a bogus "lineage" field — or updateMany matches 0 docs.)
     await dashboardServices.updateManyDashboards(
       {
         userId: dashboard.userId,
-        lineage,
-        sharedPayload,
+        $or: [{ lineageId: lineage }, { _id: lineage }],
       },
       { $set: { sharedWith: sharedPayload } }
     );
@@ -288,7 +316,7 @@ async function handlePostDashboard(req, res, next) {
 
     let prev = null;
     if (previousDashboardId && mongoose.Types.ObjectId.isValid(String(previousDashboardId))) {
-      prev = await dashboardServices.findDashboardByIdLean(previousDashboardId).lean();
+      prev = await dashboardServices.findDashboardByIdLean(previousDashboardId);
     }
 
     if (!prev) {
@@ -465,8 +493,8 @@ async function handleSyncDashboard(req, res, next) {
     const base = ownerLatest.baseName
       ? ownerLatest.baseName
       : String(rawName)
-        .replace(/\s+\(v\d+\)\s+.+$/, '')
-        .trim() || rawName;
+          .replace(/\s+\(v\d+\)\s+.+$/, '')
+          .trim() || rawName;
     const nextName = `${base} (v${vn}) ${ts}`;
 
     const mergedPayload = await dashboardServices.buildDashboardPayload({
@@ -480,6 +508,7 @@ async function handleSyncDashboard(req, res, next) {
     const mergedDb = await dashboardServices.createDashboard(mergedPayload);
     return res.status(HTTP_STATUS.CREATED).json({ ok: true, dashboard: mergedDb });
   } catch (error) {
+    console.error('Sync error:', error);
     next(error);
   }
 }
