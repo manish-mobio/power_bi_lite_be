@@ -23,7 +23,7 @@ async function insertManyInDynamicCollection(collectionName, docs) {
 async function createCollectionMeta(data) {
   return Collection.create(data);
 }
-async function buildCollectionPayload({
+function buildCollectionPayload({
   collName,
   detectedSchema,
   parsedData = [],

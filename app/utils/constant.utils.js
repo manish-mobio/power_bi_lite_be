@@ -16,12 +16,20 @@ const constants = {
   DASHBOARD_NOT_FOUND: 'Dashboard not found',
   INVALID_DASHBOARD_ID: 'Invalid dashboard ID',
   SHARES_MUST_BE_A_NON_EMPTY_ARRAY: 'Shares must be a non-empty array',
+  SHARES_MUST_BE_AN_ARRAY: 'Shares must be an array',
+  SHARE_UPDATE_PAYLOAD_REQUIRED:
+    'Provide shares or target users to update dashboard access',
+  SHARE_DASHBOARD_EMAIL_SUBJECT: 'Dashboard access updated',
+  SHARE_DASHBOARD_FALLBACK_NAME: 'Dashboard',
   CSV_MUST_HAVE_AT_LEAST_A_HEADER_AND_ONE_DATA_ROW:
     'CSV must have at least a header and one data row',
   ONLY_EDITORS_CAN_SHARE: 'Only editors can share',
   CANNOT_SAVE_DASHBOARD: 'Cannot save this dashboard',
   ONLY_OWNER_CAN_SYNC_SHARED_CHANGES: 'Only the owner can sync shared changes',
   DASHBOARD_LINEAGE_NOT_FOUND: 'Dashboard lineage not found',
+  SYNC_NO_COLLABORATOR_VERSIONS: 'No collaborator versions found to sync',
+  SYNC_ALREADY_MATCHES_LATEST_COLLABORATOR:
+    'Dashboard already matches the latest collaborator version',
   FILE_CONTENT_REQUIRED: 'File content is required',
   UNSUPPORTED_FILE_TYPE: 'Unsupported file type. Use CSV or JSON.',
   NO_VALID_DATA_FOUND_IN_FILE: 'No valid data found in file',
