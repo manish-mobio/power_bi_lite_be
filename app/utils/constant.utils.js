@@ -28,6 +28,10 @@ const constants = {
   FAILED_TO_PARSE_FILE: 'Failed to parse file',
   SESSION_EXPIRED: 'Session expired',
   EXPIRES_IN_DAYS: '7d',
+  FILE_UPLOAD_NEW: (collName, count) =>
+    `Uploaded ${count} records into new collection '${collName}'`,
+  FILE_UPLOAD_REPLACED: (collName, count) =>
+    `Replaced collection '${collName}' with ${count} records`,
 };
 
 export default constants;

@@ -84,13 +84,14 @@ async function handleFileUpload(req, res, next) {
         );
       } else {
         // Create new collection metadata
+        const collectionPayload = fileUploadServices.buildCollectionPayload({
+          collName,
+          detectedSchema,
+          parsedData,
+          inserted,
+        });
         await fileUploadServices.createCollectionMeta(
-          fileUploadServices.buildCollectionPayload({
-            collName,
-            detectedSchema,
-            parsedData,
-            inserted,
-          })
+          collectionPayload
         );
       }
 

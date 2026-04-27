@@ -23,18 +23,20 @@ async function insertManyInDynamicCollection(collectionName, docs) {
 async function createCollectionMeta(data) {
   return Collection.create(data);
 }
-async function buildCollectionPayload({
+function buildCollectionPayload({
   collName,
   detectedSchema,
   parsedData = [],
   inserted = [],
   sampleLimit = 100,
 }) {
+  const safeRows = Array.isArray(parsedData) ? parsedData : [];
+  const safeInserted = Array.isArray(inserted) ? inserted : [];
   return {
     name: collName,
     schema: detectedSchema,
-    data: parsedData.slice(0, sampleLimit),
-    recordCount: inserted.length,
+    data: safeRows.slice(0, sampleLimit),
+    recordCount: safeInserted.length,
   };
 }
 

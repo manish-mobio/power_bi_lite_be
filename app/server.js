@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from '../config/db.js';
 import morgan from 'morgan';
 import cors from 'cors';
+import compression from 'compression';
 
 import { logger } from './utils/logger.utils.js';
 import requestLogs from './middleware/requestLog.middleware.js';
@@ -23,6 +24,18 @@ await connectDB();
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
+app.use(
+  compression({
+    // Skip tiny payloads to reduce CPU overhead.
+    threshold: '10kb',
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // Enable CORS for all origins and standard HTTP methods.
 app.use(
