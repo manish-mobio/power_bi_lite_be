@@ -6,16 +6,32 @@ import {
   handleLogout,
   handleMe,
   handleChangePassword,
+  handleForgotPassword,
+  handleResetPassword,
 } from '../controller/auth.controller.js';
 import { handleValidationErrors } from '../middleware/validation.middleware.js';
 import {
   signupValidation,
   loginValidation,
   changePasswordValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
 } from '../middleware/validation.middleware.js';
 const router = express.Router();
 router.post('/signup', signupValidation, handleValidationErrors, handleSignup);
 router.post('/login', loginValidation, handleValidationErrors, handleLogin);
+router.post(
+  '/forgot-password',
+  forgotPasswordValidation,
+  handleValidationErrors,
+  handleForgotPassword
+);
+router.post(
+  '/reset-password/:token',
+  resetPasswordValidation,
+  handleValidationErrors,
+  handleResetPassword
+);
 router.post('/logout', handleLogout);
 router.get('/me', requireAuth, handleMe);
 router.post(

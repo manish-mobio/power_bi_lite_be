@@ -4,6 +4,9 @@ import bcrypt from 'bcryptjs';
 import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
 import authServices from '../services/auth.services.js';
+import mailService from '../services/mail.service.js';
+
+const RESET_TOKEN_TTL_MINUTES = 15;
 
 async function handleSignup(req, res, next) {
   try {
@@ -25,10 +28,6 @@ async function handleSignup(req, res, next) {
       passwordHash,
       name: typeof name === 'string' ? name.trim() : '',
     });
-
-    const token = authServices.generateToken({ sub: String(user._id), email: user.email });
-
-    setAuthCookie(res, token);
 
     return res
       .status(HTTP_STATUS.CREATED)
@@ -119,4 +118,81 @@ async function handleChangePassword(req, res, next) {
   }
 }
 
-export { handleSignup, handleLogin, handleMe, handleLogout, handleChangePassword };
+async function handleForgotPassword(req, res, next) {
+  try {
+    const cleanEmail = normalizeEmail(req.body?.email);
+    if (!cleanEmail) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.EMAIL_REQUIRED });
+    }
+
+    const user = await authServices.findOneAuthUser({ email: cleanEmail });
+    if (!user) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ error: constants.USER_NOT_FOUND });
+    }
+
+    const resetToken = authServices.generatePasswordResetToken();
+    const hashedToken = authServices.hashPasswordResetToken(resetToken);
+    const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60 * 1000);
+
+    await authServices.setPasswordResetToken({
+      userId: user._id,
+      hashedToken,
+      expiresAt,
+    });
+
+    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+    const text = `Reset your password using this link: ${resetLink}. This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.`;
+
+    await mailService.sendMail({
+      to: cleanEmail,
+      subject: 'Reset your password',
+      text,
+      html: `<p>Reset your password by clicking the link below:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.</p>`,
+    });
+
+    return res.status(HTTP_STATUS.OK).json({ message: constants.RESET_LINK_SENT });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function handleResetPassword(req, res, next) {
+  try {
+    const token = String(req.params?.token || '').trim();
+    const newPassword = String(req.body?.password || '');
+    if (!token) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.RESET_TOKEN_REQUIRED });
+    }
+    if (newPassword.length < 8) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.INVALID_PASSWORD_LENGTH });
+    }
+
+    const hashedToken = authServices.hashPasswordResetToken(token);
+    const user = await authServices.findAuthUserByResetToken(hashedToken);
+
+    if (!user) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ error: constants.INVALID_OR_EXPIRED_RESET_TOKEN });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 12);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpire = null;
+    await user.save();
+
+    return res.status(HTTP_STATUS.OK).json({ message: constants.PASSWORD_RESET_SUCCESS });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export {
+  handleSignup,
+  handleLogin,
+  handleMe,
+  handleLogout,
+  handleChangePassword,
+  handleForgotPassword,
+  handleResetPassword,
+};

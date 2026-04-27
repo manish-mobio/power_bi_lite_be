@@ -78,4 +78,31 @@ export const changePasswordValidation = [
   }),
 ];
 
+export const forgotPasswordValidation = [
+  body('email')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.EMAIL_REQUIRED)
+    .bail()
+    .isEmail()
+    .withMessage(constants.EMAIL_REQUIRED)
+    .bail()
+    .trim()
+    .toLowerCase(),
+];
+
+export const resetPasswordValidation = [
+  param('token')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.RESET_TOKEN_REQUIRED)
+    .bail()
+    .isString()
+    .withMessage(constants.RESET_TOKEN_REQUIRED),
+  body('password')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.INVALID_PASSWORD_LENGTH)
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage(constants.INVALID_PASSWORD_LENGTH),
+];
+
 export { handleValidationErrors };
