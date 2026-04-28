@@ -107,9 +107,10 @@ async function handleFileUpload(req, res, next) {
         schema: schemaArray,
         recordCount: inserted.length,
         replaced: isReplacement,
+
         message: isReplacement
-          ? constants.FILE_UPLOAD_REPLACED(collName, inserted.length)
-          : constants.FILE_UPLOAD_NEW(collName, inserted.length),
+          ? `Successfully replaced collection "${collName}" with ${inserted.length} records`
+          : `Successfully uploaded ${inserted.length} records to collection "${collName}"`,
       });
     } catch (parseError) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({

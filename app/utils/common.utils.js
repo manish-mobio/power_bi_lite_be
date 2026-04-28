@@ -6,11 +6,15 @@ function normalizeEmail(email) {
 
 function sameDashboardPayload(a, b) {
   const pa = JSON.stringify({
+    baseName: a?.baseName || '',
+    collection: a?.collection || '',
     charts: a?.charts || [],
     layouts: a?.layouts || {},
     logo: a?.logo ?? null,
   });
   const pb = JSON.stringify({
+    baseName: b?.baseName || '',
+    collection: b?.collection || '',
     charts: b?.charts || [],
     layouts: b?.layouts || {},
     logo: b?.logo ?? null,
@@ -59,4 +63,6 @@ function inferSchema(doc) {
 
   return schema;
 }
-export { normalizeEmail, sameDashboardPayload, inferSchema };
+
+const SHARE_ROLES = new Set(['Viewer', 'Editor']);
+export { normalizeEmail, sameDashboardPayload, inferSchema, SHARE_ROLES };

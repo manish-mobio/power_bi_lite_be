@@ -29,6 +29,7 @@ const dashboardSchema = new mongoose.Schema(
     layouts: { type: Object, default: {} },
     logo: { type: String },
     collection: { type: String },
+    parent_id: { type: mongoose.Schema.Types.ObjectId, index: true, default: null },
     lineageId: { type: mongoose.Schema.Types.ObjectId, index: true },
     ownerLineageId: { type: mongoose.Schema.Types.ObjectId, index: true },
     versionNumber: { type: Number, default: 1 },
