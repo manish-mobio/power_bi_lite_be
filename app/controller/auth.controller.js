@@ -150,12 +150,6 @@ async function handleResetPassword(req, res, next) {
   try {
     const token = String(req.params?.token || '').trim();
     const newPassword = String(req.body?.password || '');
-    if (!token) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.RESET_TOKEN_REQUIRED });
-    }
-    if (newPassword.length < 8) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants.INVALID_PASSWORD_LENGTH });
-    }
 
     const hashedToken = authServices.hashPasswordResetToken(token);
     const user = await authServices.findAuthUserByResetToken(hashedToken);

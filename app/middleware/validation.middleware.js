@@ -2,6 +2,7 @@ import { validationResult, body } from 'express-validator';
 import { param } from 'express-validator';
 import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
+import { getResetPasswordValidationError } from '../utils/common.utils.js';
 
 function handleValidationErrors(req, res, next) {
   const errors = validationResult(req);
@@ -105,4 +106,17 @@ export const resetPasswordValidation = [
     .withMessage(constants.INVALID_PASSWORD_LENGTH),
 ];
 
-export { handleValidationErrors };
+function validateResetPasswordParams(req, res, next) {
+  const validationError = getResetPasswordValidationError(
+    req.params?.token,
+    req.body?.password
+  );
+
+  if (validationError) {
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants[validationError] });
+  }
+
+  return next();
+}
+
+export { handleValidationErrors, validateResetPasswordParams };

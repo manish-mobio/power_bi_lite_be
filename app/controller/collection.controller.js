@@ -2,7 +2,12 @@ import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
 import mongoose from 'mongoose';
 import collectionServices from '../services/collection.services.js';
-import { PAGE_SIZE } from '../utils/common.utils.js';
+import {
+  PAGE_SIZE,
+  parseYearMonthValue,
+  parseQuarterValue,
+  parseYearValue,
+} from '../utils/common.utils.js';
 async function handleGetCollectionData(req, res, next) {
   try {
     const { collection } = req.params;
@@ -53,35 +58,26 @@ async function handleGetCollectionData(req, res, next) {
           filter[filterField] = range;
         }
       } else if (filterType === 'month' && filterValue) {
-        const match = String(filterValue)
-          .trim()
-          .match(/^(\d{4})-(\d{2})$/);
-        if (match) {
-          const year = parseInt(match[1], 10);
-          const month = parseInt(match[2], 10);
-          if (!Number.isNaN(year) && !Number.isNaN(month) && month >= 1 && month <= 12) {
-            const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
-            const end = new Date(year, month, 0, 23, 59, 59, 999);
-            filter[filterField] = { $gte: start, $lte: end };
-          }
+        const monthValue = parseYearMonthValue(filterValue);
+        if (monthValue) {
+          const { year, month } = monthValue;
+          const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
+          const end = new Date(year, month, 0, 23, 59, 59, 999);
+          filter[filterField] = { $gte: start, $lte: end };
         }
       } else if (filterType === 'quarter' && filterValue) {
-        const match = String(filterValue)
-          .trim()
-          .match(/^(\d{4})-Q([1-4])$/i);
-        if (match) {
-          const year = parseInt(match[1], 10);
-          const quarter = parseInt(match[2], 10);
-          if (!Number.isNaN(year) && !Number.isNaN(quarter)) {
-            const startMonth = (quarter - 1) * 3;
-            const start = new Date(year, startMonth, 1, 0, 0, 0, 0);
-            const end = new Date(year, startMonth + 3, 0, 23, 59, 59, 999);
-            filter[filterField] = { $gte: start, $lte: end };
-          }
+        const quarterValue = parseQuarterValue(filterValue);
+        if (quarterValue) {
+          const { year, quarter } = quarterValue;
+          const startMonth = (quarter - 1) * 3;
+          const start = new Date(year, startMonth, 1, 0, 0, 0, 0);
+          const end = new Date(year, startMonth + 3, 0, 23, 59, 59, 999);
+          filter[filterField] = { $gte: start, $lte: end };
         }
       } else if (filterType === 'year' && filterValue) {
-        const year = parseInt(String(filterValue).trim(), 10);
-        if (!Number.isNaN(year)) {
+        const yearValue = parseYearValue(filterValue);
+        if (yearValue) {
+          const { year } = yearValue;
           const start = new Date(year, 0, 1, 0, 0, 0, 0);
           const end = new Date(year, 11, 31, 23, 59, 59, 999);
           filter[filterField] = { $gte: start, $lte: end };

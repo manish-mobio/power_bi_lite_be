@@ -16,8 +16,10 @@ import {
   changePasswordValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
+  validateResetPasswordParams,
 } from '../middleware/validation.middleware.js';
 const router = express.Router();
+
 router.post('/signup', signupValidation, handleValidationErrors, handleSignup);
 router.post('/login', loginValidation, handleValidationErrors, handleLogin);
 router.post(
@@ -30,6 +32,7 @@ router.post(
   '/reset-password/:token',
   resetPasswordValidation,
   handleValidationErrors,
+  validateResetPasswordParams,
   handleResetPassword
 );
 router.post('/logout', handleLogout);
