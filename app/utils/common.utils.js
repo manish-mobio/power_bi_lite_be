@@ -65,4 +65,6 @@ function inferSchema(doc) {
 }
 
 const SHARE_ROLES = new Set(['Viewer', 'Editor']);
+export const RESET_TOKEN_TTL_MINUTES = 15;
+export const PAGE_SIZE = 1000;
 export { normalizeEmail, sameDashboardPayload, inferSchema, SHARE_ROLES };

@@ -46,6 +46,7 @@ const constants = {
     `Uploaded ${count} records into new collection '${collName}'`,
   FILE_UPLOAD_REPLACED: (collName, count) =>
     `Replaced collection '${collName}' with ${count} records`,
+  RESET_PASSWORD_MAIL: 'Reset your password',
 };
 
 export default constants;

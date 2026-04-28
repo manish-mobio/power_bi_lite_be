@@ -1,12 +1,10 @@
 import { clearAuthCookie, setAuthCookie } from '../middleware/auth.middleware.js';
-import { normalizeEmail } from '../utils/common.utils.js';
+import { normalizeEmail, RESET_TOKEN_TTL_MINUTES } from '../utils/common.utils.js';
 import bcrypt from 'bcryptjs';
 import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
 import authServices from '../services/auth.services.js';
-import mailService from '../services/mail.service.js';
-
-const RESET_TOKEN_TTL_MINUTES = 15;
+import { sendResetPasswordMail } from '../utils/share-dashboard-email.utils.js';
 
 async function handleSignup(req, res, next) {
   try {
@@ -139,16 +137,8 @@ async function handleForgotPassword(req, res, next) {
       hashedToken,
       expiresAt,
     });
-
-    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
-    const text = `Reset your password using this link: ${resetLink}. This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.`;
-
-    await mailService.sendMail({
-      to: cleanEmail,
-      subject: 'Reset your password',
-      text,
-      html: `<p>Reset your password by clicking the link below:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.</p>`,
-    });
+    const resetLink = `${process.env.FRONTEND_BASE_URL}/reset-password/${resetToken}`;
+    await sendResetPasswordMail(cleanEmail, resetLink);
 
     return res.status(HTTP_STATUS.OK).json({ message: constants.RESET_LINK_SENT });
   } catch (error) {
