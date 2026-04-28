@@ -1,7 +1,46 @@
+import constants from './constant.utils.js';
+
 function normalizeEmail(email) {
   return String(email || '')
     .trim()
     .toLowerCase();
+}
+
+function getResetPasswordValidationError(token, password, minPasswordLength = 8) {
+  const safeToken = String(token || '').trim();
+  const safePassword = String(password || '');
+
+  if (!safeToken) return constants.RESET_TOKEN_REQUIRED;
+  if (safePassword.length < minPasswordLength) return constants.INVALID_PASSWORD_LENGTH;
+  return '';
+}
+
+function parseYearMonthValue(value) {
+  const match = String(value)
+    .trim()
+    .match(/^([0-9]{4})-([0-9]{2})$/);
+  if (!match) return null;
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  if (Number.isNaN(year) || Number.isNaN(month) || month < 1 || month > 12) return null;
+  return { year, month };
+}
+
+function parseQuarterValue(value) {
+  const match = String(value)
+    .trim()
+    .match(/^([0-9]{4})-Q([1-4])$/i);
+  if (!match) return null;
+  const year = parseInt(match[1], 10);
+  const quarter = parseInt(match[2], 10);
+  if (Number.isNaN(year) || Number.isNaN(quarter)) return null;
+  return { year, quarter };
+}
+
+function parseYearValue(value) {
+  const year = parseInt(String(value).trim(), 10);
+  if (Number.isNaN(year)) return null;
+  return { year };
 }
 
 function sameDashboardPayload(a, b) {
@@ -65,4 +104,15 @@ function inferSchema(doc) {
 }
 
 const SHARE_ROLES = new Set(['Viewer', 'Editor']);
-export { normalizeEmail, sameDashboardPayload, inferSchema, SHARE_ROLES };
+export const RESET_TOKEN_TTL_MINUTES = 15;
+export const PAGE_SIZE = 1000;
+export {
+  normalizeEmail,
+  sameDashboardPayload,
+  inferSchema,
+  getResetPasswordValidationError,
+  parseYearMonthValue,
+  parseQuarterValue,
+  parseYearValue,
+  SHARE_ROLES,
+};

@@ -1,6 +1,7 @@
-import { normalizeEmail } from './common.utils.js';
+import { normalizeEmail, RESET_TOKEN_TTL_MINUTES } from './common.utils.js';
 import constants from './constant.utils.js';
 import emailHtml from '../template/email-body.utils.js';
+import mailService from '../services/mail.service.js';
 
 function resolveWebBaseUrl(mailContext = {}) {
   let webBaseUrl = '';
@@ -124,4 +125,13 @@ async function sendDashboardShareEmails({
   }
 }
 
-export { sendDashboardShareEmails };
+async function sendResetPasswordMail(Email, resetLink) {
+  const text = `Reset your password using this link: ${resetLink}. This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.`;
+  await mailService.sendMail({
+    to: Email,
+    subject: constants.RESET_PASSWORD_MAIL,
+    text,
+    html: `<p>Reset your password by clicking the link below:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link expires in ${RESET_TOKEN_TTL_MINUTES} minutes.</p>`,
+  });
+}
+export { sendDashboardShareEmails, sendResetPasswordMail };

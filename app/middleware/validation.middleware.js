@@ -2,6 +2,7 @@ import { validationResult, body } from 'express-validator';
 import { param } from 'express-validator';
 import HTTP_STATUS from '../utils/statuscode.js';
 import constants from '../utils/constant.utils.js';
+import { getResetPasswordValidationError } from '../utils/common.utils.js';
 
 function handleValidationErrors(req, res, next) {
   const errors = validationResult(req);
@@ -78,4 +79,44 @@ export const changePasswordValidation = [
   }),
 ];
 
-export { handleValidationErrors };
+export const forgotPasswordValidation = [
+  body('email')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.EMAIL_REQUIRED)
+    .bail()
+    .isEmail()
+    .withMessage(constants.EMAIL_REQUIRED)
+    .bail()
+    .trim()
+    .toLowerCase(),
+];
+
+export const resetPasswordValidation = [
+  param('token')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.RESET_TOKEN_REQUIRED)
+    .bail()
+    .isString()
+    .withMessage(constants.RESET_TOKEN_REQUIRED),
+  body('password')
+    .exists({ checkFalsy: true })
+    .withMessage(constants.INVALID_PASSWORD_LENGTH)
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage(constants.INVALID_PASSWORD_LENGTH),
+];
+
+function validateResetPasswordParams(req, res, next) {
+  const validationError = getResetPasswordValidationError(
+    req.params?.token,
+    req.body?.password
+  );
+
+  if (validationError) {
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: constants[validationError] });
+  }
+
+  return next();
+}
+
+export { handleValidationErrors, validateResetPasswordParams };
